@@ -27,11 +27,9 @@ class ViewController: UIViewController {
         AF.request("https://api.flickr.com/services/rest/", parameters: param).responseJSON { (response) in
             switch response.result {
             case .success(let value):
-                guard
-                    let jsonContainer = value as? [String: Any],
-                    let jsonPhoto = jsonContainer["photos"] as? [String: Any],
-                    let jsonArray = jsonPhoto["photo"] as? [[String: Any]]
-                else { return }
+                guard let photo = FlickrPhoto.getArray(from: value) else { return }
+                print(photo)
+                
             case.failure(let error):
                 print(error)
             }
