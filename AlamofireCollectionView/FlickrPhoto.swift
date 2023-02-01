@@ -5,13 +5,14 @@
 //  Created by Артем Галай on 31.01.23.
 //
 
-import Foundation
+import UIKit
 
 struct FlickrPhoto {
     let farm: Int
     let server: String
     let photoID: String
     let secret: String
+    var thumbnail: UIImage?
 
     init?(json: [String: Any]) {
         guard let farm = json["farm"] as? Int,
@@ -23,7 +24,14 @@ struct FlickrPhoto {
         self.server = server
         self.photoID = photoID
         self.secret = secret
-    }
+        
+            guard let url = flickrImageURL(),
+                  let thumbnailData = try? Data(contentsOf: url),
+                  let thumbnailImage = UIImage(data: thumbnailData)
+            else { return }
+
+            self.thumbnail = thumbnailImage
+        }
 
     static func getArray(from value: Any) -> [FlickrPhoto]? {
         guard
@@ -40,5 +48,9 @@ struct FlickrPhoto {
             flickrPhotoArray.append(photo)
         }
         return flickrPhotoArray
+    }
+
+    func flickrImageURL(_ size: String = "m") -> URL? {
+        return URL(string: "https://farm\(farm).staticfrickr.com/\(server)/\(photoID)_\(secret)_\(size).jpg")
     }
 }
